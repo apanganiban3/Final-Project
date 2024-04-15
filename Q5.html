@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Rates Calculator</title>
+    <style>
+        /* CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container1 {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #4CAF50; /* Background color */
+            color: #fff; /* Text color */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        select,
+        input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input[type="button"] {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        input[type="button"]:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        /* Chart.js styles */
+        #exchangeRateChart {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <!-- Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Main content -->
+    <div id="container1">
+        <h1>Website Project</h1>
+        <h1>Akinyomi Olugbenga 154234223</h1>
+        <h1>Alvic Panganiban 132640236</h1>
+    </div>
+
+    <div id="container">
+        <h1>Compare Exchange Rates</h1>
+        <form id="exchangeRateForm">
+            <label for="country1">Select first country:</label>
+            <select id="country1" name="country1">
+                <!-- Options will be populated dynamically -->
+            </select>
+            <label for="country2">Select second country:</label>
+            <select id="country2" name="country2">
+                <!-- Options will be populated dynamically -->
+            </select>
+            <!-- Amount input and converter -->
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" min="0">
+            <label for="convertedAmount">Converted Amount:</label>
+            <input type="text" id="convertedAmount" name="convertedAmount" readonly placeholder="Equivalent amount in Country 2">
+            
+            <!-- Historical date input -->
+            <label for="date">Select date:</label>
+            <input type="date" id="date" name="date">
+            
+            <input type="button" value="Compare" onclick="compareExchangeRates()">
+            <!-- Convert button -->
+            <input type="button" value="Convert" onclick="convertCurrency()">
+        </form>
+        <!-- Exchange rate table -->
+        <table id="exchangeRateTable" style="display:none;">
+            <!-- Table headers -->
+            <thead>
+                <tr>
+                    <th>Country</th>
+                    <th>Exchange Rate (USD)</th>
+                </tr>
+            </thead>
+            <!-- Table body -->
+            <tbody>
+                <tr>
+                    <td id="countryName1"></td>
+                    <td id="exchangeRate1"></td>
+                </tr>
+                <tr>
+                    <td id="countryName2"></td>
+                    <td id="exchangeRate2"></td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Exchange rate chart -->
+        <canvas id="exchangeRateChart" width="400" height="200"></canvas>
+    </div>
+
+    <!-- JavaScript code -->
+    <script>
+        function populateCountries() {
+            fetch('https://open.er-api.com/v6/latest/USD')
+                .then(response => response.json())
+                .then(data => {
+                    const countries = Object.keys(data.rates);
+                    const countryDropdowns = document.querySelectorAll('select[name^="country"]');
+
+                    countries.forEach(country => {
+                        countryDropdowns.forEach(dropdown => {
+                            const option = document.createElement('option');
+                            option.value = country;
+                            option.textContent = country;
+                            dropdown.appendChild(option);
+                        });
+                    });
+                })
+                .catch(error => console.log('Error fetching country data:', error));
+        }
+
+        function fetchExchangeRate(country, targetCurrency, date) {
+            const formattedDate = date.split('-').reverse().join('-'); // Reformat date to 'dd-mm-yyyy'
+            const apiUrl = `https://open.er-api.com/v6/${formattedDate}/latest/${country}`;
+
+            return fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.rates && data.rates[targetCurrency]) {
+                        return data.rates[targetCurrency];
+                    } else {
+                        throw new Error(`Exchange rate data not available for ${country} on ${date}`);
+                    }
+                })
+                .catch(error => {
+                    console.log('Error fetching exchange rate:', error);
+                    return null;
+                });
+        }
+
+        async function compareExchangeRates() {
+            let country1 = document.getElementById("country1").value.trim();
+            let country2 = document.getElementById("country2").value.trim();
+            let date = document.getElementById("date").value;
+
+            let countryName1 = document.getElementById("country1").options[document.getElementById("country1").selectedIndex].text;
+            let countryName2 = document.getElementById("country2").options[document.getElementById("country2").selectedIndex].text;
+
+            document.getElementById("countryName1").textContent = countryName1;
+            document.getElementById("countryName2").textContent = countryName2;
+
+            try {
+                const exchangeRate1 = await fetchExchangeRate(country1, "USD", date);
+                const exchangeRate2 = await fetchExchangeRate(country2, "USD", date);
+
+                document.getElementById("exchangeRate1").textContent = exchangeRate1 !== null ? `${exchangeRate1} USD` : 'Data not available';
+                document.getElementById("exchangeRate2").textContent = exchangeRate2 !== null ? `${exchangeRate2} USD` : 'Data not available';
+
+                // Show the table after updating the content
+                document.getElementById("exchangeRateTable").style.display = "table";
+
+                // Update the chart
+                updateExchangeRateChart(countryName1, countryName2, exchangeRate1, exchangeRate2);
+            } catch (error) {
+                console.log('Error comparing exchange rates:', error);
+            }
+        }
+
+        function convertCurrency() {
+            let amount = parseFloat(document.getElementById("amount").value);
+            let exchangeRate1 = parseFloat(document.getElementById("exchangeRate1").textContent);
+            let exchangeRate2 = parseFloat(document.getElementById("exchangeRate2").textContent);
+            let countryName1 = document.getElementById("countryName1").textContent;
+            let countryName2 = document.getElementById("countryName2").textContent;
+
+            if (!isNaN(amount) && !isNaN(exchangeRate1) && !isNaN(exchangeRate2)) {
+                let convertedAmount = (amount / exchangeRate1) * exchangeRate2;
+                document.getElementById("convertedAmount").value = convertedAmount.toFixed(2);
+                document.getElementById("convertedAmount").setAttribute("placeholder", `Equivalent amount in ${countryName2}`);
+            } else {
+                alert("Please enter valid amounts and exchange rates.");
+            }
+        }
+
+        function updateExchangeRateChart(country1, country2, rate1, rate2) {
+            const ctx = document.getElementById('exchangeRateChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [country1, country2],
+                    datasets: [{
+                        label: 'Exchange Rates (USD)',
+                        data: [rate1, rate2],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+
+        window.onload = populateCountries;
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!-- views/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Data</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Country Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Population</th>
+                <th>Capital</th>
+                <th>Membership</th>
+                <th>GDP Total</th>
+                <th>Inflation Rate</th>
+                <th>Unemployment Rate</th>
+                <th>Government</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% countries.forEach(country => { %>
+                <tr>
+                    <td><%= country.name %></td>
+                    <td><%= country.population %></td>
+                    <td><%= country.capital %></td>
+                    <td><%= country.membership %></td>
+                    <td><%= country.gdp_total %></td>
+                    <td><%= country.inflation_rate %></td>
+                    <td><%= country.unemployment_rate %></td>
+                    <td><%= country.government %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</body>
+</html>
