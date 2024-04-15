@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{country.name}} Information</title>
+</head>
+<body>
+    <h1>{{country.name}} Information</h1>
+    <p><strong>Country Code:</strong> {{country["@car_code"]}}</p>
+    <p><strong>Area:</strong> {{country["@area"]}} sq km</p>
+    <p><strong>Capital:</strong> {{country["@capital"]}}</p>
+    <p><strong>Memberships:</strong> {{country["@memberships"]}}</p>
+    <p><strong>Population:</strong> {{country.population.[@year].[#text]}}</p>
+    <p><strong>Population Growth:</strong> {{country.population_growth}}%</p>
+    <p><strong>Infant Mortality:</strong> {{country.infant_mortality}} per 1000 live births</p>
+    <p><strong>GDP Total:</strong> ${{country.gdp_total}} billion</p>
+    <p><strong>GDP Agriculture:</strong> {{country.gdp_agri}}%</p>
+    <p><strong>GDP Industry:</strong> {{country.gdp_ind}}%</p>
+    <p><strong>GDP Services:</strong> {{country.gdp_serv}}%</p>
+    <p><strong>Inflation Rate:</strong> {{country.inflation}}%</p>
+    <p><strong>Unemployment Rate:</strong> {{country.unemployment}}%</p>
+    <p><strong>Government:</strong> {{country.government}}</p>
+    <p><strong>Continent:</strong> {{country.encompassed["@continent"]}}</p>
+    <p><strong>Ethnic Groups:</strong></p>
+    <ul>
+        {{#each country.ethnicgroup}}
+            <li>{{@percentage}}% {{#text}}</li>
+        {{/each}}
+    </ul>
+    <p><strong>Religions:</strong></p>
+    <ul>
+        {{#each country.religion}}
+            <li>{{@percentage}}% {{#text}}</li>
+        {{/each}}
+    </ul>
+    <p><strong>Languages:</strong></p>
+    <ul>
+        {{#each country.language}}
+            <li>{{@percentage}}% {{#text}}</li>
+        {{/each}}
+    </ul>
+    <p><strong>Borders:</strong></p>
+    <ul>
+        {{#each country.border}}
+            <li>{{@country}} - {{@length}} km</li>
+        {{/each}}
+    </ul>
+    <p><strong>Cities:</strong></p>
+    <ul>
+        {{#each country.city}}
+            <li>{{name}} (Population: {{population.[@year].[#text]}})</li>
+        {{/each}}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Country Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Capital</th>
+                <th>Membership</th>
+                <th>GDP Total</th>
+                <th>Inflation Rate</th>
+                <th>Unemployment Rate</th>
+                <th>Government</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each countries}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.capital}}</td> 
+                <td>{{this.memberships}}</td> 
+                <td>{{this.gdp_total}}</td>
+                <td>{{this.inflation}}</td>
+                <td>{{this.unemployment}}</td>
+                <td>{{this.government}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</body>
+
+</html>
